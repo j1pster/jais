@@ -9,6 +9,10 @@
 // @include        http://ingress.com/intel*
 // @match          https://ingress.com/intel*
 // @match          http://ingress.com/intel*
+// @include        https://www.ingress.com/intel*
+// @include        http://www.ingress.com/intel*
+// @match          https://www.ingress.com/intel*
+// @match          http://www.ingress.com/intel*
 // @include        https://www.ingress.com/mission/*
 // @include        http://www.ingress.com/mission/*
 // @match          https://www.ingress.com/mission/*
@@ -37,11 +41,13 @@ window.plugin.jais.boot = function() {
         "portals": window.plugin.jais.justAnotherPortalArray
     };
     window.plugin.jais.links = [];
+    window.plugin.jais.load();
     window.plugin.jais.link = {
         init: function(o, d, layer, order) {
-            this.from = o;
-            this.to = d;
-            this.layer = layer;
+            this.from = Object.create(window.plugin.jais.portal)
+            this.from.init(o);
+            this.to = Object.create(window.plugin.jais.portal)
+            this.to.init(d);
             this.order = order !== undefined ? order : window.plugin.jais.links.length;
             this.oLat = o.getLatLng().lat;
             this.oLng = o.getLatLng().lng;
@@ -49,6 +55,14 @@ window.plugin.jais.boot = function() {
             this.dLng = d.getLatLng().lng;
         }
     };
+    window.plugin.jais.portal = {
+        init: function(portal) {
+            this.guid = portal.options.guid;
+            this.title = portal.options.data.title;
+            this.image = portal.options.data.image;
+            this.latlng = portal.getLatLng();
+        }
+    }
     $('head').append('<style>' +
         '.ui-dialog-jais-export textarea { width:96%; height:150px; resize:vertical; }'+
         '.ui-dialog-jais-export.optionBox a {display: block; width: 80%; margin: 10px auto; text-align: center; background-color: rgba(27, 50, 64, 0.9); padding: 3px;}'+
@@ -115,7 +129,8 @@ window.plugin.jais.openJaisDialog = function() {
             if(window.plugin.reswue) {
                 html += '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.addPortalsToCurrentReswueOp();\' role=\'button\'>Add to Reswue</button>';
             }
-            html += '<div id=\'textareadiv\' class=\'ui-dialog-content\'><textarea readonly onclick="$(\'#textareadiv textarea\').select();">'+ JSON.stringify(window.plugin.jais.justAnotherPortalArray) +'</textarea>'
+            html += '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.linkDialog();\' role=\'button\'>Create Linkplan</button>'
+            + '<div id=\'textareadiv\' class=\'ui-dialog-content\'><textarea readonly onclick="$(\'#textareadiv textarea\').select();">'+ JSON.stringify(window.plugin.jais.justAnotherPortalArray) +'</textarea>'
             + '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick="$(\'#textareadiv textarea\').focus().select();" role=\'button\'>Select All</button>'
             + '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.clearPortals();\' role=\'button\'>Clear</button>'
             + '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.closeTextArea();\' role=\'button\'>Close</button></div>';
@@ -131,6 +146,65 @@ window.plugin.jais.openJaisDialog = function() {
    });
    return;
 };
+
+window.plugin.jais.linkDialog = function() {
+    self = window.plugin.jais;
+    var html = "<div id=\'linkplanner\'><p>Build your own linkplan.</p>";
+    if(self.link.length === 0) {
+        html += "<p id=\'nolinks\'>You don't appear to have any links in your plan. To add links, simply use the drawtools plugin and draw triangles or single links. they will appear in this dialog</p>";
+    } else {
+        html += "<button type=\'button\' id=\'saveLinks\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.saveLinkOrder();\' role=\'button\'>Save</button>" +
+        "<button type=\'button\' id=\'clearLinks\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.clearLinks();\' role=\'button\'>Clear</button>";
+        html += "<div id=\'tableWrapper\'>" + self.linkHTML(); + "</div>";
+    }
+    html += "</div>";
+    dialog({
+        html: html,
+        width: 450,
+        dialogClass: 'ui-dialog-jais-links',
+        title: 'Linkplan Builder'
+    });
+}
+
+window.plugin.jais.linkHTML = function() {
+    var html = "<table id=\'linkTable\' class=\'portal-counts\'><tbody><tr><th colspan=\'3\'></th></tr>" +
+    "<tr><th>order</th><th>from</th><th>to</th></tr>";
+    for(var i = 0; i < window.plugin.jais.links.length; i++) {
+        var link = window.plugin.jais.links[i];
+        html += "<tr class=\'link\'><td class=\'input\'><input type=\'number\' min=\'0\' data-idx=\'" + i + "\' value=\'" + link.order +
+        "\'></td><td class=\'portalName\'><a onClick=\'renderPortalDetails(\"" + link.from.guid + "\");\'>" + link.from.title + "</a></td>" +
+        "<td class=\'portalName\'><a onClick=\'renderPortalDetails(\""+ link.to.guid + "\");\'>" + link.to.title + "</td></tr>";
+    }
+    html += "</tbody></table>"
+    return html;
+}
+
+window.plugin.jais.orderSort = function(a, b) {
+    return a.order - b.order;
+}
+
+window.plugin.jais.saveLinkOrder = function() {
+    var self = window.plugin.jais;
+    var parent = document.getElementById("linkplanner");
+    var inputs = parent.getElementsByTagName("input");
+    var length = inputs.length;
+    for(var i = 0; i < length; i++) {
+        input = inputs[i];
+        self.links[input.dataset.idx].order = input.valueAsNumber;
+    }
+    self.links.sort(self.orderSort);
+    parent.removeChild(document.getElementById("tableWrapper"));
+    var newTable = document.createElement('div');
+    newTable.id = "tableWrapper";
+    newTable.innerHTML = self.linkHTML();
+    parent.appendChild(newTable);
+}
+
+window.plugin.jais.clearLinks = function() {
+    var parent = document.getElementById("linkplanner");
+    parent.removeChild(document.getElementById("linkTable"));
+    window.plugin.jais.links = [];
+}
 
 window.plugin.jais.countPortals = function() {
     var self = window.plugin.jais;
@@ -426,13 +500,13 @@ window.plugin.jais.addEventListeners = function() {
 
 window.plugin.jais.drawToolsHandler = function(e) {
     var self = window.plugin.jais;
+    console.log(e);
     if(e.event === "layerCreated") {
         self.layerCreatedHandler(e);
     }
 };
 
 window.plugin.jais.layerCreatedHandler = function(e) {
-    console.log(e);
     self = window.plugin.jais;
     var pi = [];
     var latlngs = e.layer.getLatLngs();
@@ -464,9 +538,8 @@ window.plugin.jais.layerCreatedHandler = function(e) {
     var linkDoesntExistYet = function(origin, destination) {
         for(var l = 0; l < self.links.length; l++) {
             var cl = self.links[l];
-            console.log(cl.from._leaflet_id, origin._leaflet_id, cl.to._leaflet_id, destination._leaflet_id);
-            if((cl.from._leaflet_id === origin._leaflet_id && cl.to._leaflet_id === destination._leaflet_id) ||
-            (cl.to._leaflet_id === origin._leaflet_id && cl.from._leaflet_id === destination._leaflet_id)) {
+            if((cl.from.guid === origin.options.guid && cl.to.guid === destination.options.guid)
+            || (cl.to.guid === origin.options.guid && cl.from.guid === destination.options.guid)) {
                 return false;
             }
         }
@@ -496,6 +569,21 @@ window.plugin.jais.layerCreatedHandler = function(e) {
                 self.links.push(newLink);
             }
         }
+    }
+    window.plugin.jais.save();
+};
+
+window.plugin.jais.save = function() {
+    localStorage['plugin-jais-links'] = JSON.stringify(window.plugin.jais.links);
+};
+
+window.plugin.jais.load = function() {
+    try {
+        var data = localStorage['plugin-jais-links'];
+        if(data === undefined) return;
+        window.plugin.jais.links = JSON.parse(data);
+    } catch(e) {
+        console.warn('jais: failed to load links from localStorage: '+e);
     }
 };
 
