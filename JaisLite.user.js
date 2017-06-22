@@ -44,15 +44,16 @@ window.plugin.jais.boot = function() {
     window.plugin.jais.load();
     window.plugin.jais.link = {
         init: function(o, d, layer, order) {
-            this.from = Object.create(window.plugin.jais.portal)
+            this.from = Object.create(window.plugin.jais.portal);
             this.from.init(o);
-            this.to = Object.create(window.plugin.jais.portal)
+            this.to = Object.create(window.plugin.jais.portal);
             this.to.init(d);
             this.order = order !== undefined ? order : window.plugin.jais.links.length;
             this.oLat = o.getLatLng().lat;
             this.oLng = o.getLatLng().lng;
             this.dLat = d.getLatLng().lat;
             this.dLng = d.getLatLng().lng;
+            this.idx = 0; 
         }
     };
     window.plugin.jais.portal = {
@@ -62,7 +63,7 @@ window.plugin.jais.boot = function() {
             this.image = portal.options.data.image;
             this.latlng = portal.getLatLng();
         }
-    }
+    };
     $('head').append('<style>' +
         '.ui-dialog-jais-export textarea { width:96%; height:150px; resize:vertical; }'+
         '.ui-dialog-jais-export.optionBox a {display: block; width: 80%; margin: 10px auto; text-align: center; background-color: rgba(27, 50, 64, 0.9); padding: 3px;}'+
@@ -72,6 +73,9 @@ window.plugin.jais.boot = function() {
         'table.portal-counts {margin-top:5px; border-collapse: collapse; empty-cells: show; width: 100%; clear: both;}'+
         '.portal-count-box tr {width:95%; margin:0 auto;}'+
         '.portal-count-box td, th{text-align:center; color:white; vertical-align:middle; border-bottom: 1px solid #0b314e; padding: 3px;}'+
+        '.portal-counts td input[type=\"number\"] {width: 66px;} .portalName {margin-top: 5px; width: 150px; height: 25px; overflow:hidden; white-space: nowrap; text-overflow: ellipsis;}' +
+        '.tableWrapper {max-height: 300px; overflow: auto;}' + 
+        'td .deleteButton {min-width: 25px; height: 25px; background-repeat: no-repeat; background-size: 19px; border: none; background-position: 3px 3px; margin-left: 8px; background-image: url(\'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAASFBMVEUAAAD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgCmumIqAAAAF3RSTlMA4ijmJSL66RMKnoE1h9ubljERCIg5N1HUlncAAADCSURBVDjLfdNLDsIwDEXRlwbyadLSD+D975RCVT1iS/HMOncWB79JNUNNficuUxB3a31wEsq1jCKiisHLMQ86C/pVTCIs6OcUIAVhoV1CQhVRxeGcin1uCuUuA3fXFI37AVBFjMpNoZxFz1lYZ9F1FtZZ+H+PxjHEJuDLmfexb0u3hXVbWO/chy2sR28K9b53p4rsGtf3kVH79/HCFnr3ERJQevfx/K4LXRfjuS50FvRjShCn72OWMHHd1gw1+3p+/w+X6C/xVVv7WAAAAABJRU5ErkJggg==\')}' + 
         'td.resistance {background-color: #0088FF;}'+
         'td.enlightened {background-color: #03DC03;}'+
         '</style>');
@@ -129,11 +133,13 @@ window.plugin.jais.openJaisDialog = function() {
             if(window.plugin.reswue) {
                 html += '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.addPortalsToCurrentReswueOp();\' role=\'button\'>Add to Reswue</button>';
             }
-            html += '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.linkDialog();\' role=\'button\'>Create Linkplan</button>'
-            + '<div id=\'textareadiv\' class=\'ui-dialog-content\'><textarea readonly onclick="$(\'#textareadiv textarea\').select();">'+ JSON.stringify(window.plugin.jais.justAnotherPortalArray) +'</textarea>'
+            html += '<div id=\'textareadiv\' class=\'ui-dialog-content\'><textarea readonly onclick="$(\'#textareadiv textarea\').select();">'+ JSON.stringify(window.plugin.jais.justAnotherPortalArray) +'</textarea>'
             + '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick="$(\'#textareadiv textarea\').focus().select();" role=\'button\'>Select All</button>'
             + '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.clearPortals();\' role=\'button\'>Clear</button>'
             + '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.closeTextArea();\' role=\'button\'>Close</button></div>';
+        }
+        if(window.plugin.jais.links.lenght !== 0) {
+            html += '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.linkDialog();\' role=\'button\'>Create Linkplan</button>';
         }
     } else {
         html += "<p>Drawtools doesn't seem to be installed. You can find it <a href=\'https://static.iitc.me/build/release/plugins/draw-tools.user.js\'>here</a>.</p>";
@@ -157,40 +163,41 @@ window.plugin.jais.linkDialog = function() {
         "<button type=\'button\' id=\'clearLinks\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.clearLinks();\' role=\'button\'>Clear</button>";
         html += "<div id=\'tableWrapper\'>" + self.linkHTML(); + "</div>";
     }
-    html += "</div>";
+    html += "<button id=\'linksToReswue\' class=\'jais-button ui-dialog-buttonset\' onClick=\'window.plugin.jais.addLinksToCurrentReswueOp();\' role=\'button\'>Add to Reswue</button></div>";
     dialog({
         html: html,
-        width: 450,
+        width: 475,
         dialogClass: 'ui-dialog-jais-links',
         title: 'Linkplan Builder'
     });
-}
+};
 
 window.plugin.jais.linkHTML = function() {
     var html = "<table id=\'linkTable\' class=\'portal-counts\'><tbody><tr><th colspan=\'3\'></th></tr>" +
-    "<tr><th>order</th><th>from</th><th>to</th></tr>";
+    "<tr><th>order</th><th>from</th><th>to</th><th>delete</th></tr>";
     for(var i = 0; i < window.plugin.jais.links.length; i++) {
         var link = window.plugin.jais.links[i];
-        html += "<tr class=\'link\'><td class=\'input\'><input type=\'number\' min=\'0\' data-idx=\'" + i + "\' value=\'" + link.order +
-        "\'></td><td class=\'portalName\'><a onClick=\'renderPortalDetails(\"" + link.from.guid + "\");\'>" + link.from.title + "</a></td>" +
-        "<td class=\'portalName\'><a onClick=\'renderPortalDetails(\""+ link.to.guid + "\");\'>" + link.to.title + "</td></tr>";
+        link.idx = i;
+        html += "<tr id=\'link" + i + "\' class=\'link\'><td width=\'15%\' class=\'input\'><input type=\'number\' min=\'0\' data-idx=\'" + i + "\' value=\'" + link.order +
+        "\'></td><td><div class=\'portalName\'><a onClick=\'renderPortalDetails(\"" + link.from.guid + "\");\'>" + link.from.title + "</a></div></td>" +
+        "<td><div class=\'portalName\'><a onClick=\'renderPortalDetails(\""+ link.to.guid + "\");\'>" + link.to.title + "</a></div></td>" +
+        "<td><button class=\'deleteButton\' onclick=\'window.plugin.jais.deleteLink(" + i + ");\' role=\'button\'></button></td></tr>";
     }
-    html += "</tbody></table>"
+    html += "</tbody></table>";
     return html;
-}
+};
 
 window.plugin.jais.orderSort = function(a, b) {
     return a.order - b.order;
-}
+};
 
 window.plugin.jais.saveLinkOrder = function() {
     var self = window.plugin.jais;
-    var parent = document.getElementById("linkplanner");
-    var inputs = parent.getElementsByTagName("input");
-    var length = inputs.length;
+    var length = self.links.length;
     for(var i = 0; i < length; i++) {
-        input = inputs[i];
+        var input = document.getElementById(self.links[i].idx + "").getElementsByTagName('input')[0];
         self.links[input.dataset.idx].order = input.valueAsNumber;
+        
     }
     self.links.sort(self.orderSort);
     parent.removeChild(document.getElementById("tableWrapper"));
@@ -198,11 +205,19 @@ window.plugin.jais.saveLinkOrder = function() {
     newTable.id = "tableWrapper";
     newTable.innerHTML = self.linkHTML();
     parent.appendChild(newTable);
+};
+
+window.plugin.jais.deleteLink = function(idx) {
+    var self = window.plugin.jais;
+    self.links.splice(idx, 1);
+    var theLink = document.getElementById("link" + idx);
+    theLink.parentElement.removeChild(theLink);
+    self.saveLinkOrder();
 }
 
 window.plugin.jais.clearLinks = function() {
-    var parent = document.getElementById("linkplanner");
-    parent.removeChild(document.getElementById("linkTable"));
+    var table = document.getElementById("linkTable");
+    table.parentElement.removeChild(table);
     window.plugin.jais.links = [];
 }
 
@@ -491,6 +506,36 @@ window.plugin.jais.addPortalsToCurrentReswueOp = function() {
     }
 };
 
+window.plugin.jais.addLinksToCurrentReswueOp = function() {
+    if(window.plugin.reswue.core.selectedOperation !== undefined) {
+        var self = window.plugin.jais;
+        self.selectedOperation = window.plugin.reswue.core.selectedOperation.data.operationName;
+        self.currentLayer = window.plugin.reswue.layerManager.activeLayer;
+        self.linkOrLinks = self.links.length == 1 ? "Link" : "Links";
+        if(self.selectedOperation && self.currentLayer) {
+            if(confirm("Are you sure you want to add " + self.links.length + " " + self.linkOrLinks + " to layer \"" + self.currentLayer + "\" in operation " + self.selectedOperation + "?")) {
+                var linksAlreadyInOpPromise = window.plugin.reswue.core.selectedOperation.linkService.getLinks();
+                linksAlreadyInOpPromise.then(function(result) {
+                    window.plugin.jais.linksInOpArray = result;
+                    for(var i = 0; i < self.links.length; i++) {
+                        self.currentLink = self.links[i];
+                        if(!self.linkAlreadyInOp(self.linksInOpArray, self.currentLink)){
+                            window.plugin.reswue.core.selectedOperation.linkService.addLink(self.currentLink.from.guid, self.currentLink.to.guid, self.currentLayer, false, window.plugin.reswue.localConfig.nickname, self.currentLink.order + "");
+                        } else {
+                            console.log('link from' + self.currentLink.from.title + "to " + self.currentLink.to.tile +' is already in this operation');
+                        }
+                    }
+                });
+            }
+            else {
+                return;
+            }
+        }
+    } else {
+        alert("You don't have a reswue op selected. Please select an operation before adding portals to it.");
+    }
+};
+
 window.plugin.jais.addEventListeners = function() {
     var self = window.plugin.jais;
     window.addHook('iitcLoaded', function() {
@@ -596,12 +641,17 @@ window.plugin.jais.portalAlreadyInOp = function(portalsInOp, thePortal) {
     return false;
 };
 
-XMLHttpRequest.prototype.realSend = XMLHttpRequest.prototype.send;
-XMLHttpRequest.prototype.send = function(value) {
-    this.addEventListener("progress", function(){
-        window.plugin.jais.getRelevantInfoFromClickedPortal(this);
-    }, false);
-    this.realSend(value);
+window.plugin.jais.linkAlreadyInOp = function(linksInOp, theLink) {
+    var length = linksInOp.length;
+    console.log(linksInOp);
+    for(var i = 0; i < length; i++) {
+        link = linksInOp[i];
+        if((link.portalFrom.id === theLink.from.guid && link.portalTo.id === theLink.to.guid) 
+        || (link.portalTo.id === theLink.from.guid && link.portalFrom.id === theLink.to.guid)) {
+            return true;
+        }
+    }
+    return false;
 };
 
 var setup=function(){
