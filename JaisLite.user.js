@@ -195,12 +195,14 @@ window.plugin.jais.saveLinkOrder = function() {
     var self = window.plugin.jais;
     var length = self.links.length;
     for(var i = 0; i < length; i++) {
-        var input = document.getElementById(self.links[i].idx + "").getElementsByTagName('input')[0];
+        var input = document.getElementById("link" + self.links[i].idx).getElementsByTagName('input')[0];
         self.links[input.dataset.idx].order = input.valueAsNumber;
         
     }
     self.links.sort(self.orderSort);
-    parent.removeChild(document.getElementById("tableWrapper"));
+    var tableWrapper = document.getElementById("tableWrapper");
+    var parent = tableWrapper.parentElement;
+    parent.removeChild(tableWrapper);
     var newTable = document.createElement('div');
     newTable.id = "tableWrapper";
     newTable.innerHTML = self.linkHTML();
@@ -514,18 +516,43 @@ window.plugin.jais.addLinksToCurrentReswueOp = function() {
         self.linkOrLinks = self.links.length == 1 ? "Link" : "Links";
         if(self.selectedOperation && self.currentLayer) {
             if(confirm("Are you sure you want to add " + self.links.length + " " + self.linkOrLinks + " to layer \"" + self.currentLayer + "\" in operation " + self.selectedOperation + "?")) {
-                var linksAlreadyInOpPromise = window.plugin.reswue.core.selectedOperation.linkService.getLinks();
-                linksAlreadyInOpPromise.then(function(result) {
-                    window.plugin.jais.linksInOpArray = result;
-                    for(var i = 0; i < self.links.length; i++) {
-                        self.currentLink = self.links[i];
-                        if(!self.linkAlreadyInOp(self.linksInOpArray, self.currentLink)){
-                            window.plugin.reswue.core.selectedOperation.linkService.addLink(self.currentLink.from.guid, self.currentLink.to.guid, self.currentLayer, false, window.plugin.reswue.localConfig.nickname, self.currentLink.order + "");
-                        } else {
-                            console.log('link from' + self.currentLink.from.title + "to " + self.currentLink.to.tile +' is already in this operation');
+                Promise.all([window.plugin.reswue.core.selectedOperation.portalService.getPortals(), 
+                window.plugin.reswue.core.selectedOperation.linkService.getLinks()]).then(function(values) {
+                    self.portalsAlreadyInOp = values[0];
+                    self.linksAlreadyInOp = values[1];
+                    var length = self.links.length;
+                    var linksInPlan = [];
+                    for(var i = 0; i < length; i++) {
+                        var currentLink = self.links[i];
+                        linksInPlan.push(currentLink);
+                        if(!self.linkAlreadyInOp(self.linksAlreadyInOp, currentLink)) {
+                            Promise.all([
+                                self.portalAlreadyInOp(self.portalsAlreadyInOp, currentLink.from) || self.portalAlreadyInPlan(linksInPlan, currentLink.from, currentLink) ? currentLink : window.plugin.reswue.core.selectedOperation.portalService.addPortal(currentLink.from.guid, currentLink.from.title, self.currentLayer, currentLink.from.latlng.lat, currentLink.from.latlng.lng, false, window.plugin.reswue.localConfig.nickname, "").then(function(response) {
+                                    self.portalsAlreadyInOp = response;
+                                }), 
+                                self.portalAlreadyInOp(self.portalsAlreadyInOp, currentLink.to) || self.portalAlreadyInPlan(linksInPlan, currentLink.to, currentLink) ? currentLink : window.plugin.reswue.core.selectedOperation.portalService.addPortal(currentLink.to.guid, currentLink.to.title, self.currentLayer, currentLink.to.latlng.lat, currentLink.to.latlng.lng, false, window.plugin.reswue.localConfig.nickname, "").then(function(response) {
+                                    self.portalsAlreadyInOp = response;
+                                }),
+                                currentLink
+                            ]).then(function(results) {
+                                var currentLink = results[2];
+                                window.plugin.reswue.core.selectedOperation.linkService.addLink(currentLink.from.guid, currentLink.to.guid, self.currentLayer, false, window.plugin.reswue.localConfig.nickname, currentLink.order + "");
+                            });
                         }
                     }
                 });
+                // var linksAlreadyInOpPromise = window.plugin.reswue.core.selectedOperation.linkService.getLinks();
+                // linksAlreadyInOpPromise.then(function(result) {
+                //     window.plugin.jais.linksInOpArray = result;
+                //     for(var i = 0; i < self.links.length; i++) {
+                //         self.currentLink = self.links[i];
+                //         if(!self.linkAlreadyInOp(self.linksInOpArray, self.currentLink)){
+                //             window.plugin.reswue.core.selectedOperation.linkService.addLink(self.currentLink.from.guid, self.currentLink.to.guid, self.currentLayer, false, window.plugin.reswue.localConfig.nickname, self.currentLink.order + "");
+                //         } else {
+                //             console.log('link from' + self.currentLink.from.title + "to " + self.currentLink.to.tile +' is already in this operation');
+                //         }
+                //     }
+                // });
             }
             else {
                 return;
@@ -633,6 +660,10 @@ window.plugin.jais.load = function() {
 };
 
 window.plugin.jais.portalAlreadyInOp = function(portalsInOp, thePortal) {
+    if(!thePortal.options) {
+        thePortal.options = {};
+        thePortal.options.guid = thePortal.guid;
+    }
     for(var i = 0; i < portalsInOp.length; i++) {
         if(portalsInOp[i].id == thePortal.options.guid) {
             return true;
@@ -641,11 +672,22 @@ window.plugin.jais.portalAlreadyInOp = function(portalsInOp, thePortal) {
     return false;
 };
 
+window.plugin.jais.portalAlreadyInPlan = function(linksInPlan, thePortal, currentLink) {
+    for(var i = 0; i < linksInPlan.length; i++) {
+        var link = linksInPlan[i];
+        if((link.from.guid === thePortal.guid || link.to.guid === thePortal.guid) && link !== currentLink) {
+            return true;
+        }
+    }
+    return false;
+}
+
 window.plugin.jais.linkAlreadyInOp = function(linksInOp, theLink) {
     var length = linksInOp.length;
     console.log(linksInOp);
     for(var i = 0; i < length; i++) {
         link = linksInOp[i];
+        console.log(link, theLink);
         if((link.portalFrom.id === theLink.from.guid && link.portalTo.id === theLink.to.guid) 
         || (link.portalTo.id === theLink.from.guid && link.portalFrom.id === theLink.to.guid)) {
             return true;
