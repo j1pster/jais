@@ -40,8 +40,8 @@ window.plugin.jais.boot = function() {
     window.plugin.jais.jsonOutput = {
         "portals": window.plugin.jais.justAnotherPortalArray
     };
+    window.plugin.jais.drawToolsDataLoaded = false;
     window.plugin.jais.links = [];
-    window.plugin.jais.load();
     window.plugin.jais.link = {
         init: function(o, d, layer, order) {
             this.from = Object.create(window.plugin.jais.portal);
@@ -54,6 +54,9 @@ window.plugin.jais.boot = function() {
             this.dLat = d.getLatLng().lat;
             this.dLng = d.getLatLng().lng;
             this.idx = 0; 
+            this.color = layer.options.color;
+            this.leaflets = [];
+            this.leaflets.push(layer._leaflet_id);
         }
     };
     window.plugin.jais.portal = {
@@ -296,7 +299,7 @@ window.plugin.jais.exportPortalsFromPolygon = function() {
     $('#textareadiv').show();
     var self = window.plugin.jais;
     if(self.checkForDrawTools()) {
-        thePortals = self.getPortalsFromPolygon();
+        var thePortals = self.getPortalsFromPolygon();
         for(var i = 0; i < thePortals.length; i++){
             self.GetInfoAndAddToArray(thePortals[i]);
         }
@@ -440,7 +443,7 @@ window.plugin.jais.getPortalsFromPolygon = function() {
     }
 
     for (var i = 0; i < Object.keys(window.plugin.drawTools.drawnItems._layers).length; i++) {
-        obj = window.plugin.drawTools.drawnItems._layers;
+        var obj = window.plugin.drawTools.drawnItems._layers;
         var drawnItem = window.plugin.drawTools.drawnItems._layers[Object.keys(obj)[i]];
         drawItemArray = [];
 
@@ -448,7 +451,7 @@ window.plugin.jais.getPortalsFromPolygon = function() {
             drawItemArray.push([drawnItem._latlngs[drawings].lat, drawnItem._latlngs[drawings].lng]);
         }
         for(var thePortals = 0; thePortals < Object.keys(window.portals).length; thePortals++) {
-            thePortal = window.portals[Object.keys(window.portals)[thePortals]];
+            var thePortal = window.portals[Object.keys(window.portals)[thePortals]];
             if(inside([thePortal._latlng.lat, thePortal._latlng.lng], drawItemArray)) {
                 portalArray.push(thePortal);
             } else {
@@ -541,18 +544,6 @@ window.plugin.jais.addLinksToCurrentReswueOp = function() {
                         }
                     }
                 });
-                // var linksAlreadyInOpPromise = window.plugin.reswue.core.selectedOperation.linkService.getLinks();
-                // linksAlreadyInOpPromise.then(function(result) {
-                //     window.plugin.jais.linksInOpArray = result;
-                //     for(var i = 0; i < self.links.length; i++) {
-                //         self.currentLink = self.links[i];
-                //         if(!self.linkAlreadyInOp(self.linksInOpArray, self.currentLink)){
-                //             window.plugin.reswue.core.selectedOperation.linkService.addLink(self.currentLink.from.guid, self.currentLink.to.guid, self.currentLayer, false, window.plugin.reswue.localConfig.nickname, self.currentLink.order + "");
-                //         } else {
-                //             console.log('link from' + self.currentLink.from.title + "to " + self.currentLink.to.tile +' is already in this operation');
-                //         }
-                //     }
-                // });
             }
             else {
                 return;
@@ -565,8 +556,17 @@ window.plugin.jais.addLinksToCurrentReswueOp = function() {
 
 window.plugin.jais.addEventListeners = function() {
     var self = window.plugin.jais;
-    window.addHook('iitcLoaded', function() {
-        window.addHook('pluginDrawTools', self.drawToolsHandler);
+    window.addHook('mapDataRefreshEnd', function() {
+        if(!self.drawToolsDataLoaded) {
+            window.addHook('pluginDrawTools', self.drawToolsHandler);
+            if(window.plugin.drawTools) {
+                window.plugin.jais.load();
+                map.on('draw:deleted', function(e) {
+                    window.plugin.drawTools.save();
+                    runHooks('pluginDrawTools', {event:'layersDeleted', layers: e.layers});
+                })
+            }
+        }
     });
 };
 
@@ -575,13 +575,45 @@ window.plugin.jais.drawToolsHandler = function(e) {
     console.log(e);
     if(e.event === "layerCreated") {
         self.layerCreatedHandler(e);
+    }else if(e.event === "layersDeleted" && e.layers) {
+        self.layerDeletedHandler(e.layers.getLayers());
     }
 };
 
 window.plugin.jais.layerCreatedHandler = function(e) {
     self = window.plugin.jais;
+    var layer = e.layer;
+    self.convertLayerToLinks(layer);
+    window.plugin.jais.save();
+};
+
+window.plugin.jais.layerDeletedHandler = function(layers) {
+    console.log("JAIS - Deleted drawtools layers: ", layers);
+    self = window.plugin.jais;
+    length = layers.length;
+    for(var i = 0; i < length; i++) {
+        var layer = layers[i];
+        var linksLength = self.links.length;
+        for(var j = 0; j < linksLength; j++) {
+            var currentLink = self.links[j];
+            console.log(layer._leaflet_id, currentLink.leaflets);
+            if(self.arrayContains(currentLink.leaflets, layer._leaflet_id)) {
+                console.log("link contains leaflet id", layer._leaflet_id, currentLink.leaflets);
+                if(currentLink.leaflets.length === 1) {
+                    self.links.splice(j, 1);
+                } else {
+                    currentLink.leaflets.splice(currentLink.leaflets.indexOf(layer._leaflet_id), 1);
+                }
+            }
+        }
+    }
+}
+
+window.plugin.jais.convertLayerToLinks = function(layer) {
+    console.log(layer);
     var pi = [];
-    var latlngs = e.layer.getLatLngs();
+    var self = window.plugin.jais;
+    var latlngs = layer.getLatLngs();
     var visibleBounds = map.getBounds();
     var visiblePortals = {};
     for(var guid in window.portals) {
@@ -604,7 +636,7 @@ window.plugin.jais.layerCreatedHandler = function(e) {
             minGuid = guid;
           }
         }
-        return minGuid ? portals[minGuid] : undefined;
+        return minGuid ? window.portals[minGuid] : undefined;
     };
 
     var linkDoesntExistYet = function(origin, destination) {
@@ -612,10 +644,10 @@ window.plugin.jais.layerCreatedHandler = function(e) {
             var cl = self.links[l];
             if((cl.from.guid === origin.options.guid && cl.to.guid === destination.options.guid)
             || (cl.to.guid === origin.options.guid && cl.from.guid === destination.options.guid)) {
-                return false;
+                return [false, cl];
             }
         }
-        return true;
+        return [true, undefined];
     };
 
     for(var ll = 0; ll < latlngs.length; ll++) {
@@ -625,24 +657,29 @@ window.plugin.jais.layerCreatedHandler = function(e) {
         }
     }
     if(pi.length === 2) {
-        if(linkDoesntExistYet(pi[0], pi[1])) {
-            newLink = Object.create(self.link);
+        var linkCheck = linkDoesntExistYet(pi[0], pi[1]);
+        if(linkCheck[0]) {
+            var newLink = Object.create(self.link);
             var order = self.links.length !== 0 ? self.links[self.links.length - 1].order + 1 : 0;
-            newLink.init(pi[0], pi[1], e.layer, order);
+            newLink.init(pi[0], pi[1], layer, order);
             self.links.push(newLink);
+        } else {
+            linkCheck[1].leaflets.push(layer._leaflet_id);
         }
     } else if (pi.length === 3) {
         var possibleLinks = [[pi[0], pi[1]], [pi[1], pi[2]], [pi[2], pi[0]]];
         var order = self.links.length !== 0 ? self.links[self.links.length - 1].order + 1 : 0;
         for(var i = 0; i < possibleLinks.length; i++) {
-            if(linkDoesntExistYet(possibleLinks[i][0], possibleLinks[i][1])) {
+            var linkCheck = linkDoesntExistYet(possibleLinks[i][0], possibleLinks[i][1])
+            if(linkCheck[0]) {
                 newLink = Object.create(self.link);
-                newLink.init(possibleLinks[i][0], possibleLinks[i][1], e.layer, order);
+                newLink.init(possibleLinks[i][0], possibleLinks[i][1], layer, order);
                 self.links.push(newLink);
-            }
+            } else {
+                linkCheck[1].leaflets.push(layer._leaflet_id);
+            };
         }
-    }
-    window.plugin.jais.save();
+    };
 };
 
 window.plugin.jais.save = function() {
@@ -650,13 +687,15 @@ window.plugin.jais.save = function() {
 };
 
 window.plugin.jais.load = function() {
-    try {
-        var data = localStorage['plugin-jais-links'];
-        if(data === undefined) return;
-        window.plugin.jais.links = JSON.parse(data);
-    } catch(e) {
-        console.warn('jais: failed to load links from localStorage: '+e);
+    console.log("loading links from drawTools");
+    var self = window.plugin.jais;
+    var layers = window.plugin.drawTools.drawnItems.getLayers();
+    console.log(layers);
+    for(var i = 0; i < layers.length; i++) {
+        var layer = layers[i];
+        self.convertLayerToLinks(layer);
     }
+    self.drawToolsDataLoaded = true;
 };
 
 window.plugin.jais.portalAlreadyInOp = function(portalsInOp, thePortal) {
@@ -680,15 +719,13 @@ window.plugin.jais.portalAlreadyInPlan = function(linksInPlan, thePortal, curren
         }
     }
     return false;
-}
+};
 
 window.plugin.jais.linkAlreadyInOp = function(linksInOp, theLink) {
     var length = linksInOp.length;
-    console.log(linksInOp);
     for(var i = 0; i < length; i++) {
-        link = linksInOp[i];
-        console.log(link, theLink);
-        if((link.portalFrom.id === theLink.from.guid && link.portalTo.id === theLink.to.guid) 
+        var link = linksInOp[i];
+        if((link.portalFrom.id === theLink.from.guid && link.portalTo.id === theLink.to.guid)
         || (link.portalTo.id === theLink.from.guid && link.portalFrom.id === theLink.to.guid)) {
             return true;
         }
