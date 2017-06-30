@@ -594,7 +594,7 @@ window.plugin.jais.layerDeletedHandler = function(layers) {
     for(var i = 0; i < length; i++) {
         var layer = layers[i];
         var linksLength = self.links.length;
-        for(var j = 0; j < linksLength; j++) {
+        for(var j = linksLength -1 ; j >= 0; j--) {
             var currentLink = self.links[j];
             console.log(layer._leaflet_id, currentLink.leaflets);
             if(self.arrayContains(currentLink.leaflets, layer._leaflet_id)) {
