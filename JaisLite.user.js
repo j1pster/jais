@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name Just Another Intel Script Lite
 // @namespace http://jips.website
-// @version 0.42.44
+// @version 0.42.46.20170812
 // @description Does Something
-// @updateURL      http://jips.website/Ingress/JaisLite.user.js
-// @downloadURL    http://jips.website/Ingress/JaisLite.user.js
+// @updateURL      http://j1pster.github.io/jais/JaisLite.user.js
+// @downloadURL    http://j1pster.github.io/jais/JaisLite.user.js
 // @include        https://ingress.com/intel*
 // @include        http://ingress.com/intel*
 // @match          https://ingress.com/intel*
@@ -79,6 +79,7 @@ window.plugin.jais.boot = function() {
         '.portal-counts td input[type=\"number\"] {width: 66px;} .portalName {margin-top: 5px; width: 150px; height: 25px; overflow:hidden; white-space: nowrap; text-overflow: ellipsis;}' +
         '.tableWrapper {max-height: 300px; overflow: auto;}' + 
         'td .deleteButton {min-width: 25px; height: 25px; background-repeat: no-repeat; background-size: 19px; border: none; background-position: 3px 3px; margin-left: 8px; background-image: url(\'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAASFBMVEUAAAD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgD/zgCmumIqAAAAF3RSTlMA4ijmJSL66RMKnoE1h9ubljERCIg5N1HUlncAAADCSURBVDjLfdNLDsIwDEXRlwbyadLSD+D975RCVT1iS/HMOncWB79JNUNNficuUxB3a31wEsq1jCKiisHLMQ86C/pVTCIs6OcUIAVhoV1CQhVRxeGcin1uCuUuA3fXFI37AVBFjMpNoZxFz1lYZ9F1FtZZ+H+PxjHEJuDLmfexb0u3hXVbWO/chy2sR28K9b53p4rsGtf3kVH79/HCFnr3ERJQevfx/K4LXRfjuS50FvRjShCn72OWMHHd1gw1+3p+/w+X6C/xVVv7WAAAAABJRU5ErkJggg==\')}' + 
+        'td .swapButton {min-width: 25px; height: 25px; background-repeat: no-repeat; background-size: 19px; border: none; background-position: 3px 3px; margin-left: 8px; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTM4IDc5LjE1OTgyNCwgMjAxNi8wOS8xNC0wMTowOTowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTcgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjNBRkNFNDc1N0YzQTExRTc5QkFGRkE2NDU4RDMyMEE1IiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjNBRkNFNDc2N0YzQTExRTc5QkFGRkE2NDU4RDMyMEE1Ij4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6M0FGQ0U0NzM3RjNBMTFFNzlCQUZGQTY0NThEMzIwQTUiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6M0FGQ0U0NzQ3RjNBMTFFNzlCQUZGQTY0NThEMzIwQTUiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz47EZP0AAABNUlEQVR42mL8//8/w0ACJoYBBqMOYGE4zzgaBbgAGxBHUcGOKKhZJDtgAhDbUMEBNlCzSHJAMhBnUjGkM6FmEuUACyCeRoPongY1Gy0XoAJJIF6DFGfsQCxIocXsSGkKZLYpED+HSTL+P4eS6PYDsRWNE/4xIHYE4l/oUTCFDpYzQO2YjJ4GUqGYXiANiFNgUWAJpA/gy6s0AqAocAA54AyQYTxABeFZUBTkwRLEAIRAHhM0VeYMgANAdh6DJcLZUEwvALdvwMsBZAfASsLTQCwN5c8D4hIKLewB4iQo+xkQmyCXhOhFMUgiFClb/gTi9xQ64CdSogtBthxXZXQciLNpEPTZULPxVkYwMAcaVNQCM6FmktQgAZUPR6lg+VGoWVgBeiIceY1SxtGu2agDBtoBAAEGAG7yQdhjkxD6AAAAAElFTkSuQmCC);}' + 
         'td.resistance {background-color: #0088FF;}'+
         'td.enlightened {background-color: #03DC03;}'+
         '</style>');
@@ -91,22 +92,6 @@ window.plugin.jais.arrayContains = function(theArray, obj){
         }
     }
     return false;
-};
-
-window.plugin.jais.getRelevantInfoFromClickedPortal = function(request) {
-    /*if(request.responseURL == "https://www.ingress.com/r/getPortalDetails") {
-        response = JSON.parse(request.responseText);
-        storedRequest = JSON.parse(request.storedReq);
-        var currentPortal = {
-            "guid": storedRequest.guid,
-            "location": {
-            "lat": response.result[2] * 0.000001,
-            "lng": response.result[3] * 0.000001
-            },
-            "name": response.result[8]
-        };
-        window.plugin.jais.justAnotherPortalArray.push(currentPortal);
-    }*/
 };
 
 window.plugin.jais.GetInfoAndAddToArray = function(portal) {
@@ -164,12 +149,13 @@ window.plugin.jais.linkDialog = function() {
     } else {
         html += "<button type=\'button\' id=\'saveLinks\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.saveLinkOrder();\' role=\'button\'>Save</button>" +
         "<button type=\'button\' id=\'clearLinks\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.clearLinks();\' role=\'button\'>Clear</button>";
-        html += "<div id=\'tableWrapper\'>" + self.linkHTML(); + "</div>";
+        html += "<div id=\'tableWrapper\'><div id=\'linkAnchor\'>" + self.linkHTML() + "</div></div>";
     }
-    html += "<button id=\'linksToReswue\' class=\'jais-button ui-dialog-buttonset\' onClick=\'window.plugin.jais.addLinksToCurrentReswueOp();\' role=\'button\'>Add to Reswue</button></div>";
+    html += "<button id=\'linksToReswue\' class=\'jais-button ui-dialog-buttonset\' onClick=\'window.plugin.jais.addLinksToCurrentReswueOp();\' role=\'button\'>Add to Reswue</button>" + 
+    "<button id=\'exportToCsv\' class=\'jais-button ui-dialog-buttonset\' onClick=\'window.plugin.jais.exportToCSV(); \' role=\'button\'>Export to CSV</button></div>";
     dialog({
         html: html,
-        width: 475,
+        width: 500,
         dialogClass: 'ui-dialog-jais-links',
         title: 'Linkplan Builder'
     });
@@ -184,7 +170,8 @@ window.plugin.jais.linkHTML = function() {
         html += "<tr id=\'link" + i + "\' class=\'link\'><td width=\'15%\' class=\'input\'><input type=\'number\' min=\'0\' data-idx=\'" + i + "\' value=\'" + link.order +
         "\'></td><td><div class=\'portalName\'><a onClick=\'renderPortalDetails(\"" + link.from.guid + "\");\'>" + link.from.title + "</a></div></td>" +
         "<td><div class=\'portalName\'><a onClick=\'renderPortalDetails(\""+ link.to.guid + "\");\'>" + link.to.title + "</a></div></td>" +
-        "<td><button class=\'deleteButton\' onclick=\'window.plugin.jais.deleteLink(" + i + ");\' role=\'button\'></button></td></tr>";
+        "<td><button class=\'deleteButton\' onclick=\'window.plugin.jais.deleteLink(" + i + ");\' role=\'button\'></button></td>" + 
+        "<td><button class=\'swapButton\' onclick=\'window.plugin.jais.swapLink(" + i + ");\' role=\'button\'></button></td></tr>";
     }
     html += "</tbody></table>";
     return html;
@@ -203,11 +190,11 @@ window.plugin.jais.saveLinkOrder = function() {
         
     }
     self.links.sort(self.orderSort);
-    var tableWrapper = document.getElementById("tableWrapper");
+    var tableWrapper = document.getElementById("linkAnchor");
     var parent = tableWrapper.parentElement;
     parent.removeChild(tableWrapper);
     var newTable = document.createElement('div');
-    newTable.id = "tableWrapper";
+    newTable.id = "linkAnchor";
     newTable.innerHTML = self.linkHTML();
     parent.appendChild(newTable);
 };
@@ -218,13 +205,21 @@ window.plugin.jais.deleteLink = function(idx) {
     var theLink = document.getElementById("link" + idx);
     theLink.parentElement.removeChild(theLink);
     self.saveLinkOrder();
-}
+};
+
+window.plugin.jais.swapLink = function(idx) {
+    var self = window.plugin.jais;
+    var temp = self.links[idx].from;
+    self.links[idx].from = self.links[idx].to;
+    self.links[idx].to = temp;
+    self.saveLinkOrder();
+};
 
 window.plugin.jais.clearLinks = function() {
     var table = document.getElementById("linkTable");
     table.parentElement.removeChild(table);
     window.plugin.jais.links = [];
-}
+};
 
 window.plugin.jais.countPortals = function() {
     var self = window.plugin.jais;
@@ -325,7 +320,7 @@ window.plugin.jais.bookMarkPortalsFromPolygon = function() {
             var thePortal = thePortals[i];
             var ll = thePortal.getLatLng();
             if(self.PortalNotYetBookmarked(thePortal)) {
-                plugin.bookmarks.addPortalBookmark(thePortal.options.guid, ll.lat+','+ll.lng, thePortal.options.data.title);
+                window.plugin.bookmarks.addPortalBookmark(thePortal.options.guid, ll.lat+','+ll.lng, thePortal.options.data.title);
                 bkmrkCount++;
             } else {
                 alreadyBkmrkd++;
@@ -339,7 +334,7 @@ window.plugin.jais.bookMarkPortalsFromPolygon = function() {
             portalOrPortals2 = "Portal was";
         }
         html += "<p>"+ bkmrkCount+ " " + portalOrPortals +" succesfully added to Bookmarks.</p>"
-        + "<p>" + alreadyBkmrkd + " " + portalOrPortals2 + " already bookmarked.</p>";
+        + "<p>" + alreadyBkmrkd + " " + portalOrPortals2 + " were already bookmarked.</p>";
     } else {
         html += "<p>Please install the Bookmarks plugin, you can find it <a href=\'https://static.iitc.me/build/release/plugins/bookmarks-by-zaso.user.js\'>here</a>";
     }
@@ -554,6 +549,54 @@ window.plugin.jais.addLinksToCurrentReswueOp = function() {
     }
 };
 
+window.plugin.jais.exportToCSV = function() {
+    var self = window.plugin.jais;
+    var headers = {
+        from: "From Portal",
+        fromLink: "Intel link from Portal",
+        to: "To Portal", 
+        toLink: "Intel link to Portal",
+        order: "Link order"    
+    }
+    var formattedData = self.links.map(function(obj) {
+        var rObj = {};
+        rObj.from = obj.from.title.replace(/,/g, '');
+        rObj.fromLink = "\"https://www.ingress.com/intel?ll=" + obj.oLat + "," + obj.oLng + "&pll=" + obj.oLat + "," + obj.oLng + "\"";
+        rObj.toLink = "\"https://www.ingress.com/intel?ll=" + obj.dLat + "," + obj.dLng + "&pll=" + obj.dLat + "," + obj.dLng + "\"";
+        rObj.to = obj.to.title.replace(/,/g, '');
+        rObj.order = obj.order;
+        return rObj;
+    })
+    formattedData.unshift(headers);
+    var jsonData = JSON.stringify(formattedData);
+    var str = "";
+    var filename = "linkPlanExport.csv";
+    for(var i = 0; i < formattedData.length; i++) {
+        var line = "";
+        for(var index in formattedData[i]) {
+            if(line !== "") line += ","
+            
+            line += formattedData[i][index];
+        }
+        str += line + '\r\n';
+    }
+    var blob = new Blob([str], {type: 'text/csv;charset=utf-8;' });
+    if(navigator.msSaveBlob) {
+        navigator.msSaveBlob(blob, filename);
+    } else {
+        var link = document.createElement("a");
+        if(link.download !== undefined) {
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+};
+
 window.plugin.jais.addEventListeners = function() {
     var self = window.plugin.jais;
     window.addHook('mapDataRefreshEnd', function() {
@@ -667,7 +710,7 @@ window.plugin.jais.convertLayerToLinks = function(layer) {
             linkCheck[1].leaflets.push(layer._leaflet_id);
         }
     } else if (pi.length === 3) {
-        var possibleLinks = [[pi[0], pi[1]], [pi[1], pi[2]], [pi[2], pi[0]]];
+        var possibleLinks = [[pi[0], pi[1]], [pi[0], pi[2]], [pi[1], pi[2]]];
         var order = self.links.length !== 0 ? self.links[self.links.length - 1].order + 1 : 0;
         for(var i = 0; i < possibleLinks.length; i++) {
             var linkCheck = linkDoesntExistYet(possibleLinks[i][0], possibleLinks[i][1])
