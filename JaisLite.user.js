@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Just Another Intel Script Lite
 // @namespace http://jips.website
-// @version 0.42.46.20170812
+// @version 0.42.47.20170813
 // @description Does Something
 // @updateURL      http://j1pster.github.io/jais/JaisLite.user.js
 // @downloadURL    http://j1pster.github.io/jais/JaisLite.user.js
@@ -57,6 +57,11 @@ window.plugin.jais.boot = function() {
             this.color = layer.options.color;
             this.leaflets = [];
             this.leaflets.push(layer._leaflet_id);
+        }, 
+        swapLink: function() {
+            var temp = this.from;
+            this.from = this.to;
+            this.to = temp;
         }
     };
     window.plugin.jais.portal = {
@@ -65,13 +70,16 @@ window.plugin.jais.boot = function() {
             this.title = portal.options.data.title;
             this.image = portal.options.data.image;
             this.latlng = portal.getLatLng();
+        },
+        getLatLng: function() {
+            return {lat: this.latlng.lat, lng: this.latlng.lng};
         }
     };
     $('head').append('<style>' +
         '.ui-dialog-jais-export textarea { width:96%; height:150px; resize:vertical; }'+
         '.ui-dialog-jais-export.optionBox a {display: block; width: 80%; margin: 10px auto; text-align: center; background-color: rgba(27, 50, 64, 0.9); padding: 3px;}'+
         '#textareadiv {display:none; padding: 0;} #textareadiv textarea {margin-bottom:5%;}' +
-        '.jais-button {width: 45%; height: 40px; text-align: center; margin-left: 2.5%; margin-right: 2.5%; margin-bottom: 5%;}'+
+        '.jais-button {width: 45%; height: 40px; text-align: center; margin: 2.5%;}'+
         '.portal-count-box {display: block; width: 95%; margin:5px auto;}'+
         'table.portal-counts {margin-top:5px; border-collapse: collapse; empty-cells: show; width: 100%; clear: both;}'+
         '.portal-count-box tr {width:95%; margin:0 auto;}'+
@@ -209,9 +217,7 @@ window.plugin.jais.deleteLink = function(idx) {
 
 window.plugin.jais.swapLink = function(idx) {
     var self = window.plugin.jais;
-    var temp = self.links[idx].from;
-    self.links[idx].from = self.links[idx].to;
-    self.links[idx].to = temp;
+    self.links[idx].swapLink();
     self.saveLinkOrder();
 };
 
