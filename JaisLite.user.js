@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Just Another Intel Script Lite
 // @namespace http://jips.website
-// @version 0.42.48.20170813
+// @version 0.42.49.20170813
 // @description Does Something
 // @updateURL      http://j1pster.github.io/jais/JaisLite.user.js
 // @downloadURL    http://j1pster.github.io/jais/JaisLite.user.js
@@ -558,19 +558,19 @@ window.plugin.jais.addLinksToCurrentReswueOp = function() {
 window.plugin.jais.exportToCSV = function() {
     var self = window.plugin.jais;
     var headers = {
-        from: "From Portal",
-        fromLink: "Intel link from Portal",
-        to: "To Portal", 
-        toLink: "Intel link to Portal",
-        order: "Link order"    
+        column1: "From Portal",
+        column2: "Intel link from Portal",
+        column3: "To Portal", 
+        column4: "Intel link to Portal",
+        column5: "Link order"    
     }
     var formattedData = self.links.map(function(obj) {
         var rObj = {};
-        rObj.from = obj.from.title.replace(/,/g, '');
-        rObj.fromLink = "\"https://www.ingress.com/intel?ll=" + obj.oLat + "," + obj.oLng + "&pll=" + obj.oLat + "," + obj.oLng + "\"";
-        rObj.to = obj.to.title.replace(/,/g, '');
-        rObj.toLink = "\"https://www.ingress.com/intel?ll=" + obj.dLat + "," + obj.dLng + "&pll=" + obj.dLat + "," + obj.dLng + "\"";
-        rObj.order = obj.order;
+        rObj.column1 = obj.from.title.replace(/,/g, '');
+        rObj.column2 = "\"https://www.ingress.com/intel?ll=" + obj.oLat + "," + obj.oLng + "&pll=" + obj.oLat + "," + obj.oLng + "\"";
+        rObj.column3 = obj.to.title.replace(/,/g, '');
+        rObj.column4 = "\"https://www.ingress.com/intel?ll=" + obj.dLat + "," + obj.dLng + "&pll=" + obj.dLat + "," + obj.dLng + "\"";
+        rObj.column5 = obj.order;
         return rObj;
     })
     formattedData.unshift(headers);
