@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Just Another Intel Script Lite
 // @namespace http://jips.website
-// @version 0.42.47.20170813
+// @version 0.42.48.20170813
 // @description Does Something
 // @updateURL      http://j1pster.github.io/jais/JaisLite.user.js
 // @downloadURL    http://j1pster.github.io/jais/JaisLite.user.js
@@ -576,7 +576,6 @@ window.plugin.jais.exportToCSV = function() {
     formattedData.unshift(headers);
     var jsonData = JSON.stringify(formattedData);
     var str = "";
-    var filename = "linkPlanExport.csv";
     for(var i = 0; i < formattedData.length; i++) {
         var line = "";
         for(var index in formattedData[i]) {
@@ -586,6 +585,8 @@ window.plugin.jais.exportToCSV = function() {
         }
         str += line + '\r\n';
     }
+    var filename = window.prompt("Please enter a name for your CSV file: ", "LinkplanExport");
+    filename += ".csv";
     var blob = new Blob([str], {type: 'text/csv;charset=utf-8;' });
     if(navigator.msSaveBlob) {
         navigator.msSaveBlob(blob, filename);
