@@ -568,8 +568,8 @@ window.plugin.jais.exportToCSV = function() {
         var rObj = {};
         rObj.from = obj.from.title.replace(/,/g, '');
         rObj.fromLink = "\"https://www.ingress.com/intel?ll=" + obj.oLat + "," + obj.oLng + "&pll=" + obj.oLat + "," + obj.oLng + "\"";
-        rObj.toLink = "\"https://www.ingress.com/intel?ll=" + obj.dLat + "," + obj.dLng + "&pll=" + obj.dLat + "," + obj.dLng + "\"";
         rObj.to = obj.to.title.replace(/,/g, '');
+        rObj.toLink = "\"https://www.ingress.com/intel?ll=" + obj.dLat + "," + obj.dLng + "&pll=" + obj.dLat + "," + obj.dLng + "\"";
         rObj.order = obj.order;
         return rObj;
     })
