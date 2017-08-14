@@ -276,8 +276,7 @@ window.plugin.jais.countPortals = function() {
                 '<tr><td>Total Portals:</td><td class=\'resistance\'>'+self.portalCount[1]+'</td><td class=\'enlightened\'>'+self.portalCount[2]+'</td></tr>'+
                 '<tr><td>Total Resonators: </td><td class=\'resistance\'>'+self.resoCount[1]+'</td><td class=\'enlightened\'>'+self.resoCount[2]+'</td></tr>'+
                 '<tr><td>AP from destroying: </td><td class=\'resistance\'>'+potentialAP[1]+'</td><td class=\'enlightened\'>'+potentialAP[0]+'</td></tr>'+
-                '<tr><td>Neutral Portals: </td><td colspan=\'2\'>'+self.portalCount[0]+'</td></tr>'+
-                '<tr><td>Magnus Builder open reso slots: </td><td colspan=\'2\'>'+openResoSlots+'</td></tr></tbody></table></div>';
+                '<tr><td>Neutral Portals: </td><td colspan=\'2\'>'+self.portalCount[0]+'</td></tr>';
         dialog({
             html: html,
             width: 450,
