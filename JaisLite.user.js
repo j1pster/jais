@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Just Another Intel Script Lite
 // @namespace http://jips.website
-// @version 0.42.50.20170815
+// @version 0.42.51.20170815
 // @description Does Something
 // @updateURL      http://j1pster.github.io/jais/JaisLite.user.js
 // @downloadURL    http://j1pster.github.io/jais/JaisLite.user.js
@@ -199,7 +199,7 @@ window.plugin.jais.linkDialog = function() {
 };
 
 window.plugin.jais.linkHTML = function() {
-    var html = "<table id=\'linkTable\' class=\'portal-counts\'><tbody><tr><th colspan=\'3\'></th></tr>" +
+    var html = "<table id=\'linkTable\' class=\'portal-counts\'><tbody><tr><th colspan=\'3\'>Links</th></tr>" +
     "<tr><th>order</th><th>from</th><th>to</th><th>delete</th><th>swap</th></tr>";
     for(var i = 0; i < window.plugin.jais.links.length; i++) {
         var link = window.plugin.jais.links[i];
@@ -215,7 +215,8 @@ window.plugin.jais.linkHTML = function() {
 };
 
 window.plugin.jais.createPortalsDialog = function(portals) {
-    var html = "<table><tbody><tr><tr><th>title</th><th>Outgoing Links</th><th>Keys Needed</th><th>lat</th><th>lng</th></tr>";
+    var html = "<table id=\'portalTable\' class=\'portal-counts\'><tbody><tr><th colspan=\'3\'Links</th></tr>" +
+    "<tr><tr><th>title</th><th>Outgoing Links</th><th>Keys Needed</th><th>lat</th><th>lng</th></tr>";
     for(var key in portals) {
         var currentPortal = portals[key];
         html += "<tr id=\'portal_" + currentPortal.guid + "\' class=\'portal\'>" + 
@@ -432,14 +433,18 @@ window.plugin.jais.save = function() {
 };
 
 window.plugin.jais.load = function() {
-    console.log("loading links from drawTools");
+    console.log("Jais: trying to load links from localStorage");
     var self = window.plugin.jais;
-    var layers = window.plugin.drawTools.drawnItems.getLayers();
-    for(var i = 0; i < layers.length; i++) {
-        var layer = layers[i];
-        self.convertLayerToLinks(layer);
+    try {
+        var dataStr = localStorage['plugin-jais-links'];
+        if(dataStr === undefined) return;
+
+        var data = JSON.parse(dataStr);
+        self.links = data;
+        self.drawToolsDataLoaded = true;
+    } catch(e) {
+        console.warn('Jais: failed to load data from localStorage: ' + e);
     }
-    self.drawToolsDataLoaded = true;
 };
 
 window.plugin.jais.portalsInPlan = function() {
