@@ -155,7 +155,8 @@ window.plugin.jais.openJaisDialog = function() {
             html += '<div id=\'textareadiv\' class=\'ui-dialog-content\'><textarea readonly onclick="$(\'#textareadiv textarea\').select();">'+ JSON.stringify(window.plugin.jais.justAnotherPortalArray) +'</textarea>' + 
             '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick="$(\'#textareadiv textarea\').focus().select();" role=\'button\'>Select All</button>' +
             '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.clearPortals();\' role=\'button\'>Clear</button>' +
-            '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.closeTextArea();\' role=\'button\'>Close</button></div>';
+            '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.closeTextArea();\' role=\'button\'>Close</button>' + 
+            '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.exportPortalsInPolygon();\' role=\'button\'>Export to CSV</button></div>';
         }
         if(window.plugin.jais.links.lenght !== 0) {
             html += '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jais.linkDialog();\' role=\'button\'>Create Linkplan</button>';
@@ -607,7 +608,7 @@ window.plugin.jais.exportPortalsInPlan = function() {
         column1: "Name",
         column2: "Keys Needed", 
         column3: "Outgoing Links",
-        colmun4: "Latitutde",
+        colmun4: "Latitude",
         colmun5: "Longitude",
         column6: "Intel link", 
         colmun7: "GUID"
@@ -626,6 +627,28 @@ window.plugin.jais.exportPortalsInPlan = function() {
         }
         formattedData.push(rObj);
     }
+    var filename = window.prompt("Please enter a name for your CSV file: ", "PortalExport");
+    self.buildCSV(headers, formattedData, filename);
+}
+
+window.plugin.jais.exportPortalsInPolygon = function() {
+    var self = window.plugin.jais;
+    var headers = {
+        column1: "Name", 
+        column2: "Latitude", 
+        column3: "Longituge",
+        column4: "Intel link",
+        column5: "GUID"
+    }
+    var formattedData = self.justAnotherPortalArray.map(function(obj) {
+        return {
+            column1: obj.name.replace(/,/g, ''),
+            column2: obj.location.lat,
+            column3: obj.location.lng,
+            column4: "\"" + obj.intellink + "\"",
+            column5: obj.guid
+        }
+    });
     var filename = window.prompt("Please enter a name for your CSV file: ", "PortalExport");
     self.buildCSV(headers, formattedData, filename);
 }
