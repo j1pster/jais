@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Just Another Intel Script - enl edition
 // @namespace http://jips.website
-// @version 0.42.53.20170819
+// @version 0.42.54.20170819
 // @description Does Something
 // @updateURL      http://j1pster.github.io/jais/JaisE.user.js
 // @downloadURL    http://j1pster.github.io/jais/JaisE.user.js
@@ -139,7 +139,7 @@ function wrapper(plugin_info) {
         'As such, you\'ll need the drawTools plugin. The plugin will use every polygon.<p>';
         if(window.plugin.drawTools) {
             if(Object.keys(window.plugin.drawTools.drawnItems._layers).length === 0) {
-                html += '<p>No polygons have been detected. Please use the drawTools plugin to draw a polygon around the portals you want to use.</p>';
+                html += '<p>No polygons have been detected. Please use the drawTools plugin to draw a polygon around the portals you want to count, bookmark or export.</p>';
             } else {
                 html += '<p>Please use the buttons to select what you want to do with the portals inside the polygon</p>' +
                 '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jaisE.countPortals();\' role=\'button\'>Count</button>' +
@@ -151,8 +151,10 @@ function wrapper(plugin_info) {
                 '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jaisE.closeTextArea();\' role=\'button\'>Close</button>' + 
                 '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jaisE.exportPortalsInPolygon();\' role=\'button\'>Export to CSV</button></div>';
             }
-            if(window.plugin.jaisE.links.lenght !== 0) {
+            if(window.plugin.jaisE.links.length !== 0) {
                 html += '<button type=\'button\' class=\'jais-button ui-dialog-buttonset\' onclick=\'window.plugin.jaisE.linkDialog();\' role=\'button\'>Create Linkplan</button>';
+            } else {
+                html+= '<p>You can also draw a linkplan and export it directly. To do this, just start drawing triangles or links using drawtools. They will be added to the linkplan in the order you draw them automatically. Don\'t worry, you can change that later on.</p>';
             }
         } else {
             html += "<p>Drawtools doesn't seem to be installed. You can find it <a href=\'https://static.iitc.me/build/release/plugins/draw-tools.user.js\'>here</a>.</p>";
