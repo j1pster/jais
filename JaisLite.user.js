@@ -382,7 +382,6 @@ function wrapper(plugin_info) {
         portal2 = self.findClosestPortalInArray(drawnItem.getLatLngs()[1], allPortals),
         portal3 = self.findClosestPortalInArray(drawnItem.getLatLngs()[2], allPortals),
         portalArray = [];
-        console.log(drawnItem);
 
         for(var i = 0; i < allPortals.length; i++) {
             portalArray.push(self.getRelevantPortalInfo(allPortals[i]));
