@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name Just Another Intel Script Lite
 // @namespace http://jleijdekkers.nl
-// @version 0.5.0.20181029
+// @author J1pster
+// @version 0.5.1.20181029
 // @description Does Something
 // @updateURL      https://j1pster.github.io/jais/dist/jaisLite.user.js
 // @downloadURL    https://j1pster.github.io/jais/dist/jaisLite.user.js

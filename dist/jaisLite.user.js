@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name Just Another Intel Script Lite
 // @namespace http://jleijdekkers.nl
-// @version 0.5.0.20181029
+// @author J1pster
+// @version 0.5.1.20181029
 // @description Does Something
 // @updateURL      https://j1pster.github.io/jais/dist/jaisLite.user.js
 // @downloadURL    https://j1pster.github.io/jais/dist/jaisLite.user.js
@@ -172,7 +173,7 @@ window.plugin.jais.boot = function() {
         'th.tableHeader {font-size: 15px; padding: 20px;}' +
         '.jais-message-box {font-size: 15px; width: 80%; margin: 10px 0px; padding: 10px 10%; display: block;} .jais-hidden {display: none}' +
         '.jais-message-info {color: #00529B; background-color: #BDE5F8;} .jais-message-succes {color: #4F8A10;background-color: #DFF2BF;}' +
-        '.jais-message-warning {color: #9F6000; background-color: #FEEFB3; } .jais-message-error {color: ##D8000C; background-color: #FFD2D2;}' +
+        '.jais-message-warning {color: #9F6000; background-color: #FEEFB3; } .jais-message-error {color: ##D8000C; background-color: #FF4D4D;}' +
         '</style>');
 };
 
