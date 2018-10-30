@@ -6,14 +6,10 @@
 // @description Does Something
 // @updateURL      https://j1pster.github.io/jais/dist/jaisLite.user.js
 // @downloadURL    https://j1pster.github.io/jais/dist/jaisLite.user.js
-// @include        https://ingress.com/intel*
-// @include        http://ingress.com/intel*
-// @match          https://ingress.com/intel*
-// @match          http://ingress.com/intel*
-// @include        https://www.ingress.com/intel*
-// @include        http://www.ingress.com/intel*
-// @match          https://www.ingress.com/intel*
-// @match          http://www.ingress.com/intel*
+// @include        https://intel.ingress.com/intel*
+// @include        http://intel.ingress.com/intel*
+// @match          https://intel.ingress.com/intel*
+// @match          http://intel.ingress.com/intel*
 // @include        https://www.ingress.com/mission/*
 // @include        http://www.ingress.com/mission/*
 // @match          https://www.ingress.com/mission/*
