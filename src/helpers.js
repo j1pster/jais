@@ -78,7 +78,6 @@ window.plugin.jais.findClosestPortalInArray = function(latlng, portals) {
     var testpoint = map.project(latlng);
     var minDistSquared = undefined;
     var closestPortal = undefined
-    debugger;
     for (var p = 0; p < portals.length; p++) {
         var portal = portals[p];
         var point = map.project(portal.getLatLng());

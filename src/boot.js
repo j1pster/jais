@@ -3,7 +3,10 @@
 /*-------------------------------------------------------------------------------------------*/
 
 window.plugin.jais.boot = function() {
-    $('#toolbox').append('<a onclick="window.plugin.jais.openJaisDialog()" title=>Jais</a>');
+    var pluginName = document.createElement('a');
+    pluginName.addEventListener('click', window.plugin.jais.openJaisDialog);
+    pluginName.innerText = "Jais";
+    document.getElementById('toolbox').appendChild(pluginName);
     window.plugin.jais.justAnotherPortalArray = [];
     window.plugin.jais.addEventListeners();
     window.plugin.jais.jsonOutput = {
@@ -63,8 +66,8 @@ window.plugin.jais.boot = function() {
             return {lat: this.latlng.lat, lng: this.latlng.lng};
         }
     };
-    $('head').append('<style>' +
-        '.ui-dialog-jais-export textarea { width:96%; height:150px; resize:vertical; }'+
+    var style = document.createElement("style");
+    style.innerHTML = '.ui-dialog-jais-export textarea { width:96%; height:150px; resize:vertical; }'+
         '.ui-dialog-jais-export.optionBox a {display: block; width: 80%; margin: 10px auto; text-align: center; background-color: rgba(27, 50, 64, 0.9); padding: 3px;}'+
         '.textareadiv {display:none; padding: 0;} .textareadiv textarea {margin-bottom:5%; width: 100%; min-height: 80px;}' +
         '.jais-button {width: 45%; height: 40px; text-align: center; margin: 2.5%;}' +
@@ -82,8 +85,8 @@ window.plugin.jais.boot = function() {
         'th.tableHeader {font-size: 15px; padding: 20px;}' +
         '.jais-message-box {font-size: 15px; width: 80%; margin: 10px 0px; padding: 10px 10%; display: block;} .jais-hidden {display: none}' +
         '.jais-message-info {color: #00529B; background-color: #BDE5F8;} .jais-message-succes {color: #4F8A10;background-color: #DFF2BF;}' +
-        '.jais-message-warning {color: #9F6000; background-color: #FEEFB3; } .jais-message-error {color: ##D8000C; background-color: #FF4D4D;}' +
-        '</style>');
+        '.jais-message-warning {color: #9F6000; background-color: #FEEFB3; } .jais-message-error {color: ##D8000C; background-color: #FF4D4D;}';
+    document.getElementsByTagName('head')[0].appendChild(style);
 };
 
 window.plugin.jais.addEventListeners = function() {

@@ -2,20 +2,17 @@
 // @name Just Another Intel Script Lite
 // @namespace http://jleijdekkers.nl
 // @author J1pster
-// @version 0.5.1.20181030
+// @version 0.5.2.20181104
 // @description Does Something
 // @updateURL      https://j1pster.github.io/jais/dist/jaisLite.user.js
 // @downloadURL    https://j1pster.github.io/jais/dist/jaisLite.user.js
-// @include        https://intel.ingress.com/intel*
-// @include        http://intel.ingress.com/intel*
-// @match          https://intel.ingress.com/intel*
-// @match          http://intel.ingress.com/intel*
-// @include        https://www.ingress.com/mission/*
-// @include        http://www.ingress.com/mission/*
-// @match          https://www.ingress.com/mission/*
-// @match          http://www.ingress.com/mission/*
+// @include        *://*.ingress.com/intel*
+// @include        *://*.ingress.com/mission/*
+// @include        *://intel.ingress.com/*
+// @match          *://*.ingress.com/intel*
+// @match          *://*.ingress.com/mission/*
+// @match          *://intel.ingress.com/*
 // @copyright      2018+ JL
-// @require http://code.jquery.com/jquery-latest.js
 // ==/UserScript==
 
 function wrapper(plugin_info) {

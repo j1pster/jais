@@ -22,7 +22,7 @@ window.plugin.jais.countPortals = function() {
         for(var p = 0; p < portalsInPolygon.length; p++) {
             var team = portalsInPolygon[p].options.team,
             level = portalsInPolygon[p].options.level,
-            resosOnPortal = portalsInPolygon[p].options.resCount;
+            resosOnPortal = portalsInPolygon[p].options.data.resCount;
             if(team !== 0) {
                 portalStatistics.portalCount[team][level] += 1;
                 portalStatistics.totalPerTeam[team] += 1;

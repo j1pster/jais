@@ -2,20 +2,17 @@
 // @name Just Another Intel Script Lite
 // @namespace http://jleijdekkers.nl
 // @author J1pster
-// @version 0.5.1.20181030
+// @version 0.5.2.20181104
 // @description Does Something
 // @updateURL      https://j1pster.github.io/jais/dist/jaisLite.user.js
 // @downloadURL    https://j1pster.github.io/jais/dist/jaisLite.user.js
-// @include        https://intel.ingress.com/intel*
-// @include        http://intel.ingress.com/intel*
-// @match          https://intel.ingress.com/intel*
-// @match          http://intel.ingress.com/intel*
-// @include        https://www.ingress.com/mission/*
-// @include        http://www.ingress.com/mission/*
-// @match          https://www.ingress.com/mission/*
-// @match          http://www.ingress.com/mission/*
+// @include        *://*.ingress.com/intel*
+// @include        *://*.ingress.com/mission/*
+// @include        *://intel.ingress.com/*
+// @match          *://*.ingress.com/intel*
+// @match          *://*.ingress.com/mission/*
+// @match          *://intel.ingress.com/*
 // @copyright      2018+ JL
-// @require http://code.jquery.com/jquery-latest.js
 // ==/UserScript==
 
 function wrapper(plugin_info) {
@@ -90,7 +87,10 @@ window.plugin.jais.PortalNotYetBookmarked = function(portal) {
 /*-------------------------------------------------------------------------------------------*/
 
 window.plugin.jais.boot = function() {
-    $('#toolbox').append('<a onclick="window.plugin.jais.openJaisDialog()" title=>Jais</a>');
+    var pluginName = document.createElement('a');
+    pluginName.addEventListener('click', window.plugin.jais.openJaisDialog);
+    pluginName.innerText = "Jais";
+    document.getElementById('toolbox').appendChild(pluginName);
     window.plugin.jais.justAnotherPortalArray = [];
     window.plugin.jais.addEventListeners();
     window.plugin.jais.jsonOutput = {
@@ -150,8 +150,8 @@ window.plugin.jais.boot = function() {
             return {lat: this.latlng.lat, lng: this.latlng.lng};
         }
     };
-    $('head').append('<style>' +
-        '.ui-dialog-jais-export textarea { width:96%; height:150px; resize:vertical; }'+
+    var style = document.createElement("style");
+    style.innerHTML = '.ui-dialog-jais-export textarea { width:96%; height:150px; resize:vertical; }'+
         '.ui-dialog-jais-export.optionBox a {display: block; width: 80%; margin: 10px auto; text-align: center; background-color: rgba(27, 50, 64, 0.9); padding: 3px;}'+
         '.textareadiv {display:none; padding: 0;} .textareadiv textarea {margin-bottom:5%; width: 100%; min-height: 80px;}' +
         '.jais-button {width: 45%; height: 40px; text-align: center; margin: 2.5%;}' +
@@ -169,8 +169,8 @@ window.plugin.jais.boot = function() {
         'th.tableHeader {font-size: 15px; padding: 20px;}' +
         '.jais-message-box {font-size: 15px; width: 80%; margin: 10px 0px; padding: 10px 10%; display: block;} .jais-hidden {display: none}' +
         '.jais-message-info {color: #00529B; background-color: #BDE5F8;} .jais-message-succes {color: #4F8A10;background-color: #DFF2BF;}' +
-        '.jais-message-warning {color: #9F6000; background-color: #FEEFB3; } .jais-message-error {color: ##D8000C; background-color: #FF4D4D;}' +
-        '</style>');
+        '.jais-message-warning {color: #9F6000; background-color: #FEEFB3; } .jais-message-error {color: ##D8000C; background-color: #FF4D4D;}';
+    document.getElementsByTagName('head')[0].appendChild(style);
 };
 
 window.plugin.jais.addEventListeners = function() {
@@ -213,7 +213,7 @@ window.plugin.jais.countPortals = function() {
         for(var p = 0; p < portalsInPolygon.length; p++) {
             var team = portalsInPolygon[p].options.team,
             level = portalsInPolygon[p].options.level,
-            resosOnPortal = portalsInPolygon[p].options.resCount;
+            resosOnPortal = portalsInPolygon[p].options.data.resCount;
             if(team !== 0) {
                 portalStatistics.portalCount[team][level] += 1;
                 portalStatistics.totalPerTeam[team] += 1;
@@ -630,7 +630,6 @@ window.plugin.jais.findClosestPortalInArray = function(latlng, portals) {
     var testpoint = map.project(latlng);
     var minDistSquared = undefined;
     var closestPortal = undefined
-    debugger;
     for (var p = 0; p < portals.length; p++) {
         var portal = portals[p];
         var point = map.project(portal.getLatLng());
